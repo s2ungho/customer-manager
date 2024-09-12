@@ -1,0 +1,27 @@
+# This is a TOML document. Boom.
+
+[mongodb]
+	host="mongo"
+	port=27017
+	database="data_warehouse"
+	collection="user"
+	user="kong"
+	password="kong"
+
+[log]
+	path = "/var/log/api-user-manager/"
+	stream_handler_use = true
+	log_level = "DEBUG"
+	udplog = false
+	udplog_host = "127.0.0.1"
+	udplog_port = 9021
+	fluentd = true
+	fluentd_host = "fluentd-logger"
+	fluentd_port = 24224
+
+[app]
+	host="0.0.0.0"
+	port=29573
+	name='api-user-manager'
+	admin_user_id = 'admin'
+	admin_password = 'admin'

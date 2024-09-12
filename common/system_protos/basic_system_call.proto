@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package kornic.sf.communication.rpc;
+
+message Empty
+{
+}
+
+message RequestMessage
+{
+    string message = 1;
+}
+
+message SystemResponse
+{
+    int32 statusCode = 1;
+    string statusMessage = 2;
+    string returnBody = 3;
+}
+
+service BasicSystemCall
+{
+  //rpc SystemRequest (RequestMessage) returns (SystemResponse);
+
+  rpc SystemRequest (RequestMessage) returns (SystemResponse);
+  rpc RequestLink (Empty) returns (SystemResponse);
+}

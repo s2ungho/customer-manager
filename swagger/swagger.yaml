@@ -1,0 +1,145 @@
+swagger: "2.0"
+
+info:
+  description: api user manager
+  version: "1.0.0"
+  title: Swagger REST API
+consumes:
+  - application/json
+produces:
+  - application/json
+paths:
+  # 고객 목록 조회
+  /customer/list:
+    post:
+      operationId: app.get_list
+      summary: 고객 목록 조회
+      responses:
+        '200':
+          description: '고객 목록 반환'
+  # 고객 등록
+  /customer/register:
+    post:
+      operationId: app.register
+      summary: 고객 등록
+      parameters:
+        - in: body
+          name: req_body
+          required: true
+          schema:
+            type: object
+            required:
+              - customer_name
+              - password_hash
+            properties:
+              customer_name:
+                type: string
+                example: "홍길동"
+              password_hash:
+                type: string
+                example: "fdanjkfdvijn"
+              phone:
+                type: string
+                example: "010-0000-0000"
+              address:
+                type: string
+                example: "경기도 화성시"
+              email:
+                type: string
+                example: "kornic@kornic.co.kr"
+              membership_level:
+                type: string
+                example: "Silver"
+              marketing_level:
+                type: boolean
+                example: true
+              birth_date:
+                type: string
+                format: date
+                example: "2000-12-06"
+              company:
+                type: string
+                example: "kornic"
+              comment:
+                type: string
+                example: "메모 내용"
+      responses:
+        '200':
+          description: '고객 등록 성공'
+
+  # 고객 삭제
+  /customer/delete:
+    delete:
+      operationId: app.delete
+      summary: 고객 삭제
+      parameters:
+        - in: body
+          name: req_body
+          required: true
+          schema:
+            type: object
+            properties:
+              _id:
+                type: string
+                example: "66de7d7d44debfa1fa072f8e"  # 고객 ID
+      responses:
+        '200':
+          description: '고객 삭제 성공'
+        '404':
+          description: '고객을 찾을 수 없음'
+        '500':
+          description: '삭제 실패'
+  /customer/update:
+    put:
+      operationId: app.update
+      summary: 고객 정보 수정
+      parameters:
+        - in: body
+          name: req_body
+          required: true
+          schema:
+            type: object
+            required:
+              - _id
+            properties:
+              _id:
+                type: string
+                example: "66e14a6a272415eb9180ebbc"
+              customer_name:
+                type: string
+                example: "홍길동"
+              password_hash:
+                type: string
+                example: "new_password_hash"
+              phone:
+                type: string
+                example: "010-1234-5678"
+              address:
+                type: string
+                example: "서울특별시 강남구"
+              email:
+                type: string
+                example: "new_email@domain.com"
+              membership_level:
+                type: string
+                example: "Gold"
+              marketing_level:
+                type: boolean
+                example: false
+              birth_date:
+                type: string
+                format: date
+                example: "1990-01-01"
+              company:
+                type: string
+                example: "new_company"
+              comment:
+                type: string
+                example: "Updated comment"
+      responses:
+        '200':
+          description: '고객 정보 수정 성공'
+        '404':
+          description: '고객을 찾을 수 없음'
+        '500':
+          description: '수정 실패'
