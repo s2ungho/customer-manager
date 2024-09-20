@@ -163,7 +163,9 @@ class CustomerControl:
 
         # 삭제
         res, code = self._db_control.delete(ref)
-        if code == 200:
+        print(res)
+        print(code)
+        if code == 200 or code == 204:
             return {'message': 'Customer deleted successfully'}, 200
         else:
             return {'message': 'Delete failed'}, 500
