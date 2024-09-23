@@ -17,6 +17,32 @@ paths:
       responses:
         '200':
           description: '고객 목록 반환'
+  # 고객 정보 조회
+  /customer/{id}:
+    get:
+      operationId: app.get_customer
+      summary: 고객 정보 조회
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: string
+          description: 고객 ID
+      responses:
+        '200':
+          description: '고객 정보 반환'
+          schema:
+            type: object
+            properties:
+              _id:
+                type: string
+                example: "66e14a6a272415eb9180ebbc"
+              customer_name:
+                type: string
+                example: "홍길동"
+        '404':
+          description: '고객을 찾을 수 없음'
+
   # 고객 등록
   /customer/register:
     post:
@@ -143,3 +169,30 @@ paths:
           description: '고객을 찾을 수 없음'
         '500':
           description: '수정 실패'
+  /login:
+    post:
+      summary: "Customer login"
+      operationId: "app.login"  # 호출할 함수 정의
+      parameters:
+        - in: "body"
+          name: "credentials"
+          schema:
+            type: "object"
+            properties:
+              email:
+                type: "string"
+              password:
+                type: "string"
+      responses:
+        200:
+          description: "Login successful"
+        400:
+          description: "Invalid credentials"
+
+  /logout:
+    post:
+      summary: "Customer logout"
+      operationId: "app.logout"
+      responses:
+        200:
+          description: "Logout successful"

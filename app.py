@@ -28,6 +28,13 @@ def get_list():
     return result, code
 
 @timed
+def get_customer(id):
+    result, code = customerCtrl.find_user_by_obj_id(id)
+    if code != 200:
+        return {"message": "Customer not found"}, 404
+    return result, code
+
+@timed
 def register():
     if not request.is_json:
         return "A JSON body is required", 500
@@ -64,7 +71,26 @@ def update():
     result, code = customerCtrl.update(customer_id, req)
     return result, code
 
+#하드코딩 (사용자 데이터)
+users = {
+    "aaa@example.com": "password123"
+}
 
+# 로그인
+def login():
+    req = connexion.request.get_json()
+    email = req.get("email")
+    password = req.get("password")
+    print(email)
+    print(password)
+
+    if email in users and users[email] == password:
+        return {"message": "Login successful"}, 200
+    return {"message": "Invalid credentials"}, 400
+
+# 로그아웃
+def logout():
+    return {"message": "Logout successful"}, 200
 
 # =======================================================================
 if "MODE" in os.environ:
