@@ -83,9 +83,17 @@ def login():
     password = req.get("password")
     print(email)
     print(password)
+    user, code = customerCtrl.find_user_by_email(email)
+    print(user)
+    print(code)
 
-    if email in users and users[email] == password:
-        return {"message": "Login successful"}, 200
+    if code == 200:
+        # 입력한 비밀번호와 DB에 저장된 비밀번호 비교
+        if password == user['password_hash']:  # 비밀번호 비교
+            return {"message": "Login successful"}, 200
+        else:
+            return {"message": "Invalid credentials"}, 400
+
     return {"message": "Invalid credentials"}, 400
 
 # 로그아웃

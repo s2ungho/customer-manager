@@ -45,6 +45,11 @@ class CustomerControl:
         self._log = MainLoggerSingleton().logger()
 
     @self_logger_decorator
+    def find_user_by_email(self, email):
+        ref = {'email': email}
+        return self._db_control.find_one(ref)
+
+    @self_logger_decorator
     def find_user(self, user_id):
         ref = {'user_id': user_id}
         return self._db_control.find_one(ref)
