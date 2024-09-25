@@ -12,6 +12,7 @@ from common.make_filter_time import make_filter_time
 from models.user import User
 import jwt
 import re
+import bcrypt
 
 
 def _make_search_key(argument):
@@ -96,6 +97,10 @@ class CustomerControl:
             if field not in user_data:
                 return {'message': f'{field} is required'}, 400
 
+        # 비밀번호 해시 처리
+        user_data['password_hash'] = bcrypt.hashpw(user_data['password_hash'].encode('utf-8'),
+                                                           bcrypt.gensalt()).decode('utf-8')
+
         # MongoDB ObjectId 변환
         if "_id" in user_data:
             user_data["_id"] = ObjectId(user_data["_id"])
@@ -177,31 +182,28 @@ class CustomerControl:
 
     @self_logger_decorator
     def login(self, user: User):
-        super_user = False
         found_user, code = self.find_user(user.get_user_id())
+
         if code != 200:
-            found_user, code = self.is_admin(user)
-            if code != 200:
-                return {'message': 'User not found'}, 404
-            else:
-                super_user = True
+            return {'message': 'User not found'}, 404
 
         found_user = User(found_user)
-        if user.get_password() != self._admin_password:
-            if found_user.validate_password(user.get_password()) is False:
-                return {'message': 'Incorrect password. Please try again.'}, 401
+
+        input_password_hash = bcrypt.hashpw(user.get_password().encode('utf-8'), bcrypt.gensalt())
+
+        # 입력된 비밀번호와 해시된 비밀번호 비교
+        if not bcrypt.checkpw(input_password_hash, found_user.get_password_hash().encode('utf-8')):
+            return {'message': 'Incorrect password. Please try again.'}, 401
 
         ref = {'user_id': user.get_user_id()}
         update_body = {
             'login_datetime': datetime.now(),
             'active': True
         }
-        if super_user is False:
-            res, code = self._db_control.update(ref, update_body)
-            if code != 200:
-                return res, code
-        else:
-            res = found_user
+
+        res, code = self._db_control.update(ref, update_body)
+        if code != 200:
+            return res, code
 
         if 'password_hash' in res:
             del res['password_hash']

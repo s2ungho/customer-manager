@@ -30,3 +30,6 @@ class User(UserProperty):
 
     def is_admin(self):
         return self.admin
+
+    def get_password_hash(self):
+        return self.password_hash

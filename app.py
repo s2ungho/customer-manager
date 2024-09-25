@@ -11,9 +11,10 @@ from flask_cors import CORS
 from models.user import User
 import requests
 import re
+import bcrypt
 
 """
-=======================================================================
+=================== ====================================================
 api customer manager
 =======================================================================
 """
@@ -86,15 +87,28 @@ def login():
     user, code = customerCtrl.find_user_by_email(email)
     print(user)
     print(code)
+    print("Stored hash:", user['password_hash'])
+
+    password = "bbbb"  # 사용자가 입력한 비밀번호
+    hashed = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+    print("Input password hash:", hashed.decode('utf-8'))
 
     if code == 200:
-        # 입력한 비밀번호와 DB에 저장된 비밀번호 비교
-        if password == user['password_hash']:  # 비밀번호 비교
+        # 입력한 비밀번호와 DB에 저장된 해시된 비밀번호 비교
+        if bcrypt.checkpw(password.encode('utf-8'), user['password_hash'].encode('utf-8')):  # 비밀번호 비교
             return {"message": "Login successful"}, 200
         else:
             return {"message": "Invalid credentials"}, 400
 
     return {"message": "Invalid credentials"}, 400
+    #if code == 200:
+    #    # 입력한 비밀번호와 DB에 저장된 비밀번호 비교
+    #    if password == user['password_hash']:  # 비밀번호 비교
+    #        return {"message": "Login successful"}, 200
+    #    else:
+    #        return {"message": "Invalid credentials"}, 400
+
+    #return {"message": "Invalid credentials"}, 400
 
 # 로그아웃
 def logout():

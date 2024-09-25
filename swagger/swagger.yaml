@@ -172,7 +172,7 @@ paths:
   /login:
     post:
       summary: "Customer login"
-      operationId: "app.login"  # 호출할 함수 정의
+      operationId: "app.login"
       parameters:
         - in: "body"
           name: "credentials"
