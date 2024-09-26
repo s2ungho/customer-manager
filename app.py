@@ -13,11 +13,14 @@ import requests
 import re
 import bcrypt
 
+from interface.grpc_interface import GrpcInterface
+
 """
-=================== ====================================================
+=======================================================================
 api customer manager
 =======================================================================
 """
+
 
 @timed
 def get_list():
@@ -25,12 +28,18 @@ def get_list():
         return "A JSON body is required", 500
     req = request.get_json()
     print(req)
-    result, code = customerCtrl.get_list(req)
+    # result, code = customerCtrl.get_list(req)
+
+    grpc_result = interface.send_request('127.0.0.1', 22222, 'get_list', req)
+    result, code = interface.service_response(grpc_result)
+
     return result, code
 
 @timed
 def get_customer(id):
-    result, code = customerCtrl.find_user_by_obj_id(id)
+    req = request.get_json()
+    #result, code = customerCtrl.find_user_by_obj_id(id)
+    result, code = interface.send_request('127.0.0.1', 22222, 'get_customer', req)
     if code != 200:
         return {"message": "Customer not found"}, 404
     return result, code
@@ -40,7 +49,10 @@ def register():
     if not request.is_json:
         return "A JSON body is required", 500
     req = request.get_json()
-    result, code = customerCtrl.register(req)
+    #result, code = customerCtrl.register(req)
+    #result, code = interface.send_request('127.0.0.1', 22222, 'get_list', req)
+    grpc_result = interface.send_request('127.0.0.1', 22222, 'register_customer', req)
+    result, code = interface.service_response(grpc_result)
     return result, code
 
 @timed
@@ -54,7 +66,11 @@ def delete():
     if not customer_id:
         return {"message": "Customer ID is required"}, 400
 
-    result, code = customerCtrl.delete(customer_id)
+    #result, code = customerCtrl.delete(customer_id)
+    #result, code = interface.send_request('127.0.0.1', 22222, 'delete_customer', req)
+    grpc_result = interface.send_request('127.0.0.1', 22222, 'delete_customer', req)
+    result, code = interface.service_response(grpc_result)
+
     return result, code
 
 @timed
@@ -69,13 +85,12 @@ def update():
         return {"message": "Customer ID is required"}, 400
 
     # 고객 정보를 업데이트하는 함수 호출
-    result, code = customerCtrl.update(customer_id, req)
-    return result, code
+    #result, code = customerCtrl.update(customer_id, req)
+    #result, code = interface.send_request('127.0.0.1', 22222, 'update_customer', req)
+    grpc_result = interface.send_request('127.0.0.1', 22222, 'update_customer', req)
+    result, code = interface.service_response(grpc_result)
 
-#하드코딩 (사용자 데이터)
-users = {
-    "aaa@example.com": "password123"
-}
+    return result, code
 
 # 로그인
 def login():
@@ -84,7 +99,10 @@ def login():
     password = req.get("password")
     print(email)
     print(password)
-    user, code = customerCtrl.find_user_by_email(email)
+    #user, code = customerCtrl.find_user_by_email(email)
+    #user, code = interface.send_request('127.0.0.1', 22222, 'login_customer', req)
+    grpc_result = interface.send_request('127.0.0.1', 22222, 'login_customer', req)
+    user, code = interface.service_response(grpc_result)
     print(user)
     print(code)
     print("Stored hash:", user['password_hash'])
@@ -101,14 +119,6 @@ def login():
             return {"message": "Invalid credentials"}, 400
 
     return {"message": "Invalid credentials"}, 400
-    #if code == 200:
-    #    # 입력한 비밀번호와 DB에 저장된 비밀번호 비교
-    #    if password == user['password_hash']:  # 비밀번호 비교
-    #        return {"message": "Login successful"}, 200
-    #    else:
-    #        return {"message": "Invalid credentials"}, 400
-
-    #return {"message": "Invalid credentials"}, 400
 
 # 로그아웃
 def logout():
@@ -129,9 +139,11 @@ else:
 
 config = ConfigObj()
 config.loadingConfigFile(conf_file)
-customerCtrl = CustomerControlSingleton()
+# customerCtrl = CustomerControlSingleton()
 mainLog = MainLoggerSingleton()
 _log = mainLog.logger()
+
+interface = GrpcInterface()
 
 app = connexion.App(__name__, host=config.getValue('app', 'host'), port=config.getValue('app', 'port'),
                     specification_dir='swagger/')
